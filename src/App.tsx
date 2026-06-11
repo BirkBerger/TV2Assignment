@@ -63,11 +63,11 @@ function App() {
             width: "300px"
         }}>
             <div className="panel panel-info">
-                <div className="panel-heading">Weather in <b>{weatherData?.city || '–'}</b></div>
+                <div className="panel-heading">Weather in <b>{weatherData ? weatherData.city : weatherData === undefined ? '...' : '–'}</b></div>
                 <ul className="list-group">
-                    <li className="list-group-item">Temperature: <b>{weatherData ? `${weatherData.temperature}°C` : '–'}</b></li>
-                    <li className="list-group-item">Humidity: <b>{weatherData?.humidity || '–'}</b></li>
-                    <li className="list-group-item">Wind: <b>{weatherData ? `${weatherData.windSpeed} m/s ${weatherData.windDirection}` : '–'}</b></li>
+                    <li className="list-group-item">Temperature: <b>{weatherData ? `${weatherData.temperature}°C` : weatherData === undefined ? '...' : '–'}</b></li>
+                    <li className="list-group-item">Humidity: <b>{weatherData ? weatherData.humidity : weatherData === undefined ? '...' : '–'}</b></li>
+                    <li className="list-group-item">Wind: <b>{weatherData ? `${weatherData.windSpeed} m/s ${weatherData.windDirection}` : weatherData === undefined ? '...' : '–'}</b></li>
                     <li className="list-group-item">
                         <form className="form-inline" onSubmit={onSearchClick} style={{ display: 'flex', gap: '10px' }}>
                             <div className="form-group" style={{ margin: 0}}>
@@ -76,7 +76,7 @@ function App() {
                             <button type="submit" className="btn btn-default" style={{ flexGrow: 1 }}>Search</button>
                         </form>
                         <div style={{ minHeight: '3.6em', paddingTop: '10px' }}>
-                            {userMessage}
+                            {weatherData === undefined ? '...' : userMessage}
                         </div>
                     </li>
                 </ul>
