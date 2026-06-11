@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { WeatherData } from '../types/weather';
 import weatherService from '../services/weather-service';
 
@@ -8,7 +8,7 @@ function App() {
     const [searchInput, setSearchInput] = useState('');
     const [userMessage, setUserMessage] = useState('');
 
-    const setCityFromURL = (fallbackCity?: string) => {
+    const setCityFromURL = useCallback((fallbackCity?: string) => {
         const params = new URLSearchParams(window.location.search);
         const cityParam = params.get('city');
 
@@ -19,19 +19,19 @@ function App() {
         } else {
             fetchWeatherData(cityParam);
         }
-    };
+    }, []);
 
     // Set city on mount
     useEffect(() => {
         setCityFromURL('Copenhagen');
-    }, []);
+    }, [setCityFromURL]);
 
     // Update city on browser navigation
     useEffect(() => {
         const handlePopState = () => setCityFromURL();
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
-    }, []);
+    }, [setCityFromURL]);
 
     const onSearchClick = (e: React.FormEvent) => {
         e.preventDefault();

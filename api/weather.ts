@@ -11,7 +11,7 @@ export class WeatherApiError {
     ){}
 }
 
-export async function fetchWeather(city: String): Promise<OpenWeatherResponse> {
+export async function fetchWeather(city: string): Promise<OpenWeatherResponse> {
     try {
         const rsp = await fetch(`${OPEN_WEATHER_BASE_URL}/weather?q=${city}&appid=${import.meta.env.VITE_OPENWEATHER_API_KEY}&units=metric`);
 
