@@ -6,6 +6,7 @@ function App() {
 
     const [weatherData, setWeatherData] = useState<WeatherData | undefined | null>(undefined);
     const [searchInput, setSearchInput] = useState('');
+    const [userMessage, setUserMessage] = useState('');
 
     const setCityFromURL = (fallbackCity?: string) => {
         const params = new URLSearchParams(window.location.search);
@@ -52,6 +53,7 @@ function App() {
 
         weatherService.getWeather(city).then((rsp) => {
             setWeatherData(rsp.data);
+            setUserMessage(rsp.message);
         });
     }
 
@@ -73,6 +75,9 @@ function App() {
                             </div>
                             <button type="submit" className="btn btn-default">Search</button>
                         </form>
+                        <div style={{ minHeight: '3.6em', paddingTop: '10px' }}>
+                            {userMessage}
+                        </div>
                     </li>
                 </ul>
             </div>
