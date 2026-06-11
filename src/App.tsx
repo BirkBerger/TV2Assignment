@@ -69,11 +69,11 @@ function App() {
                     <li className="list-group-item">Humidity: <b>{weatherData?.humidity || '–'}</b></li>
                     <li className="list-group-item">Wind: <b>{weatherData ? `${weatherData.windSpeed} m/s ${weatherData.windDirection}` : '–'}</b></li>
                     <li className="list-group-item">
-                        <form className="form-inline" onSubmit={onSearchClick}>
-                            <div className="form-group">
+                        <form className="form-inline" onSubmit={onSearchClick} style={{ display: 'flex', gap: '10px' }}>
+                            <div className="form-group" style={{ margin: 0}}>
                                 <input type="text" className="form-control" id="city" placeholder="City" value={searchInput} onChange={e => setSearchInput(e.target.value)} />
                             </div>
-                            <button type="submit" className="btn btn-default">Search</button>
+                            <button type="submit" className="btn btn-default" style={{ flexGrow: 1 }}>Search</button>
                         </form>
                         <div style={{ minHeight: '3.6em', paddingTop: '10px' }}>
                             {userMessage}
