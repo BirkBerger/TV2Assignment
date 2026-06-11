@@ -1,34 +1,58 @@
 import { useEffect, useState } from "react";
+import { WeatherData } from '../types/weather';
+import weatherService from '../services/weather-service';
 
 function App() {
 
-    const defaultCity = 'Copenhagen';
-    const params = new URLSearchParams(window.location.search);
-    const newCity = params.get('city') || defaultCity;
-
-    const [city, setCity] = useState(newCity);
+    const [weatherData, setWeatherData] = useState<WeatherData | undefined | null>(undefined);
     const [searchInput, setSearchInput] = useState('');
 
-    useEffect(() => {
-        const handlePopState = () => {
-            const params = new URLSearchParams(window.location.search);
-            const newCity = params.get('city') || defaultCity;
-            setCity(newCity);
-            setSearchInput('')
-        };
+    const setCityFromURL = (fallbackCity?: string) => {
+        const params = new URLSearchParams(window.location.search);
+        const cityParam = params.get('city');
 
+        if (!cityParam && fallbackCity) {
+            // Add fallback to browser history
+            replaceCityInURL(fallbackCity)
+            fetchWeatherData(fallbackCity);
+        } else {
+            fetchWeatherData(cityParam);
+        }
+    };
+
+    // Set city on mount
+    useEffect(() => {
+        setCityFromURL('Copenhagen');
+    }, []);
+
+    // Update city on browser navigation
+    useEffect(() => {
+        const handlePopState = () => setCityFromURL();
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
-    const onSearch = (e: React.FormEvent) => {
+    const onSearchClick = (e: React.FormEvent) => {
         e.preventDefault();
+        putCityInURL(searchInput);
+        fetchWeatherData(searchInput);
+    }
 
-        const newCity = searchInput || defaultCity;
-        setCity(newCity);
+    const replaceCityInURL = (city: string) => {
+        window.history.replaceState({}, '', `?city=${encodeURIComponent(city)}`);
+    }
+
+    const putCityInURL = (city: string | null) => {
+        window.history.pushState({}, '', city ? `?city=${encodeURIComponent(city)}` : window.location.pathname);
+    }
+
+    const fetchWeatherData = (city: string | null) => {
+        setWeatherData(undefined);
         setSearchInput('');
-        params.set('city', newCity);
-        window.history.pushState({}, '', `?city=${encodeURIComponent(newCity)}`);
+
+        weatherService.getWeather(city).then((rsp) => {
+            setWeatherData(rsp.data);
+        });
     }
 
     return (
@@ -37,13 +61,13 @@ function App() {
             width: "300px"
         }}>
             <div className="panel panel-info">
-                <div className="panel-heading">Weather in <b>{city}</b></div>
+                <div className="panel-heading">Weather in <b>{weatherData?.city || '–'}</b></div>
                 <ul className="list-group">
-                    <li className="list-group-item">Temperature: <b>5°C</b></li>
-                    <li className="list-group-item">Humidity: <b>65</b></li>
-                    <li className="list-group-item">Wind: <b>11 m/s Øst</b></li>
+                    <li className="list-group-item">Temperature: <b>{weatherData ? `${weatherData.temperature}°C` : '–'}</b></li>
+                    <li className="list-group-item">Humidity: <b>{weatherData?.humidity || '–'}</b></li>
+                    <li className="list-group-item">Wind: <b>{weatherData ? `${weatherData.windSpeed} m/s ${weatherData.windDirection}` : '–'}</b></li>
                     <li className="list-group-item">
-                        <form className="form-inline" onSubmit={onSearch}>
+                        <form className="form-inline" onSubmit={onSearchClick}>
                             <div className="form-group">
                                 <input type="text" className="form-control" id="city" placeholder="City" value={searchInput} onChange={e => setSearchInput(e.target.value)} />
                             </div>
